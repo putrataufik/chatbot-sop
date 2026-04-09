@@ -1,0 +1,70 @@
+<div class="page">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Dokumen SOP</div>
+      <div class="page-subtitle">Knowledge base chatbot</div>
+    </div>
+    <button class="btn-primary" (click)="showUploadModal = true">📤 Upload Dokumen</button>
+  </div>
+
+  <div class="page-body">
+    <div class="loading" *ngIf="loading">Memuat dokumen...</div>
+
+    <div class="docs-grid" *ngIf="!loading">
+      <div class="doc-card" *ngFor="let doc of documents">
+        <div class="doc-badge" [class]="doc.format === 'PDF' ? 'badge-pdf' : 'badge-txt'">
+          {{ doc.format === 'PDF' ? '📕' : '📝' }} {{ doc.format }}
+        </div>
+        <div class="doc-title">{{ doc.title }}</div>
+        <div class="doc-meta">
+          <span>{{ formatSize(doc.file_size) }}</span>
+          <span>•</span>
+          <span>{{ doc.uploaded_at | date:'d MMM y' }}</span>
+        </div>
+        <div class="doc-actions">
+          <button class="btn-ghost flex1">👁 Lihat</button>
+          <button class="btn-danger" (click)="delete(doc.id)">🗑</button>
+        </div>
+      </div>
+
+      <div class="doc-card add-card" (click)="showUploadModal = true">
+        <span class="add-icon">+</span>
+        <span class="add-text">Upload Dokumen</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" *ngIf="showUploadModal" (click)="showUploadModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Upload Dokumen SOP</div>
+      <button class="close-btn" (click)="showUploadModal = false">✕</button>
+    </div>
+
+    <div class="drop-zone"
+         [class.drag-over]="dragOver"
+         (dragover)="$event.preventDefault(); dragOver = true"
+         (dragleave)="dragOver = false"
+         (drop)="onDrop($event)">
+      <div class="drop-icon">📤</div>
+      <div class="drop-text">Seret & lepas file di sini</div>
+      <div class="drop-hint">PDF atau TXT · Maks. 50 file sekaligus</div>
+    </div>
+
+    <div class="file-list" *ngIf="selectedFiles.length">
+      <div class="file-item" *ngFor="let f of selectedFiles">📎 {{ f.name }}</div>
+    </div>
+
+    <label class="btn-ghost center">
+      📁 Pilih File
+      <input type="file" multiple accept=".pdf,.txt" (change)="onFileSelect($event)" hidden>
+    </label>
+
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="showUploadModal = false">Batal</button>
+      <button class="btn-primary" (click)="upload()" [disabled]="!selectedFiles.length">Upload</button>
+    </div>
+  </div>
+</div>
