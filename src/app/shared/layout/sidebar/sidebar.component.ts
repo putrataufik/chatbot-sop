@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { ChatSession } from '../../../core/models/chat.model';
@@ -9,7 +10,7 @@ import { ChatService } from '../../../core/services/chat.service';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
@@ -19,12 +20,19 @@ export class SidebarComponent implements OnInit {
   navItems: any[] = [];
   sessions: ChatSession[] = [];
   activeSessionId: number | null = null;
+  sessionSearch = '';
 
   adminItems = [
     { label: 'Dashboard', icon: '📊', route: '/dashboard' },
     { label: 'Dokumen SOP', icon: '📄', route: '/documents' },
     { label: 'Manajemen User', icon: '👥', route: '/users' },
   ];
+
+  get filteredSessions(): ChatSession[] {
+    if (!this.sessionSearch.trim()) return this.sessions;
+    const q = this.sessionSearch.toLowerCase();
+    return this.sessions.filter(s => s.title.toLowerCase().includes(q));
+  }
 
   constructor(
     private auth: AuthService,

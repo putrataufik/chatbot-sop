@@ -1,23 +1,36 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DocumentService } from '../../core/services/document.service';
+import { ToastService } from '../../core/services/toast.service';
 import { SopDocument } from '../../core/models/document.model';
 
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './documents.component.html',
   styleUrls: ['./documents.component.css']
 })
 export class DocumentsComponent implements OnInit {
   documents: SopDocument[] = [];
   loading = false;
+  uploading = false;
   showUploadModal = false;
   dragOver = false;
   selectedFiles: File[] = [];
+  searchQuery = '';
 
-  constructor(private docService: DocumentService) {}
+  get filteredDocuments(): SopDocument[] {
+    if (!this.searchQuery.trim()) return this.documents;
+    const q = this.searchQuery.toLowerCase();
+    return this.documents.filter(d => d.title.toLowerCase().includes(q));
+  }
+
+  constructor(
+    private docService: DocumentService,
+    private toast: ToastService
+  ) {}
 
   ngOnInit() { this.load(); }
 
@@ -45,18 +58,33 @@ export class DocumentsComponent implements OnInit {
 
   upload() {
     if (!this.selectedFiles.length) return;
+    this.uploading = true;
     this.docService.uploadBulk(this.selectedFiles).subscribe({
-      next: () => {
+      next: (res) => {
+        this.uploading = false;
         this.showUploadModal = false;
         this.selectedFiles = [];
+        const successCount = res.success?.length ?? 0;
+        const failedCount = res.failed?.length ?? 0;
+        if (failedCount > 0) {
+          this.toast.info(`${successCount} dokumen berhasil, ${failedCount} gagal diupload`);
+        } else {
+          this.toast.success(`${successCount} dokumen berhasil diupload`);
+        }
         this.load();
-      }
+      },
+      error: () => { this.uploading = false; }
     });
   }
 
   delete(id: number) {
     if (!confirm('Hapus dokumen ini?')) return;
-    this.docService.delete(id).subscribe(() => this.load());
+    this.docService.delete(id).subscribe({
+      next: () => {
+        this.toast.success('Dokumen berhasil dihapus');
+        this.load();
+      }
+    });
   }
 
   formatSize(bytes: number): string {

@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { BulkUploadResponse, SopDocument } from '../models/document.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
-  private readonly BASE = 'http://localhost:3000/api/chatbot-sop/sop-documents';
+  private readonly BASE = `${environment.apiUrl}/sop-documents`;
 
   constructor(private http: HttpClient) {}
 

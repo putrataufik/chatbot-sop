@@ -173,3 +173,11 @@
 }
 
 .logout-btn:hover { color: var(--danger); }
+.session-search {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 10px; color: var(--text);
+  font-family: var(--font-sans); font-size: 12px; outline: none;
+  margin-bottom: 6px; box-sizing: border-box;
+}
+.session-search:focus { border-color: var(--accent); }
+.session-search::placeholder { color: var(--text3); }

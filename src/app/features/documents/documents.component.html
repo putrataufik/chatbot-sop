@@ -4,14 +4,19 @@
       <div class="page-title">Dokumen SOP</div>
       <div class="page-subtitle">Knowledge base chatbot</div>
     </div>
-    <button class="btn-primary" (click)="showUploadModal = true">📤 Upload Dokumen</button>
+    <div class="topbar-right">
+      <input class="search-input" type="text"
+             placeholder="Cari dokumen..."
+             [(ngModel)]="searchQuery">
+      <button class="btn-primary" (click)="showUploadModal = true">📤 Upload Dokumen</button>
+    </div>
   </div>
 
   <div class="page-body">
     <div class="loading" *ngIf="loading">Memuat dokumen...</div>
 
     <div class="docs-grid" *ngIf="!loading">
-      <div class="doc-card" *ngFor="let doc of documents">
+      <div class="doc-card" *ngFor="let doc of filteredDocuments">
         <div class="doc-badge" [class]="doc.format === 'PDF' ? 'badge-pdf' : 'badge-txt'">
           {{ doc.format === 'PDF' ? '📕' : '📝' }} {{ doc.format }}
         </div>
@@ -27,7 +32,11 @@
         </div>
       </div>
 
-      <div class="doc-card add-card" (click)="showUploadModal = true">
+      <div class="doc-empty" *ngIf="filteredDocuments.length === 0 && searchQuery">
+        Tidak ada dokumen yang cocok dengan "{{ searchQuery }}"
+      </div>
+
+      <div class="doc-card add-card" (click)="showUploadModal = true" *ngIf="!searchQuery">
         <span class="add-icon">+</span>
         <span class="add-text">Upload Dokumen</span>
       </div>
@@ -64,7 +73,9 @@
 
     <div class="modal-footer">
       <button class="btn-ghost" (click)="showUploadModal = false">Batal</button>
-      <button class="btn-primary" (click)="upload()" [disabled]="!selectedFiles.length">Upload</button>
+      <button class="btn-primary" (click)="upload()" [disabled]="!selectedFiles.length || uploading">
+        {{ uploading ? 'Mengupload...' : 'Upload' }}
+      </button>
     </div>
   </div>
 </div>

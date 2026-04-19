@@ -1,32 +1,70 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { DocumentService } from '../../core/services/document.service';
+import { ChatService } from '../../core/services/chat.service';
+import { SopDocument } from '../../core/models/document.model';
+import { ChatSession } from '../../core/models/chat.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DatePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, OnDestroy {
   user: any = null;
+  loading = true;
+  documents: SopDocument[] = [];
+  sessions: ChatSession[] = [];
+  today = new Date();
 
-  stats = [
-    { label: 'Dokumen SOP', value: '12', icon: '📄', theme: 'blue', trend: '+2 baru' },
-    { label: 'Total Chat', value: '247', icon: '💬', theme: 'purple', trend: '+18 hari ini' },
-    { label: 'Akurasi Respons', value: '94%', icon: '🎯', theme: 'green', trend: '↑ 3%' },
-    { label: 'Efisiensi Token', value: '62%', icon: '⚡', theme: 'yellow', trend: 'RLM vs Conv.' },
-  ];
+  private destroy$ = new Subject<void>();
 
-  activities = [
-    { text: 'User <b>Budi Santoso</b> tanya tentang <b>SOP Rekrutmen</b>', time: '2 menit lalu · 312 token (RLM)', dot: 'green' },
-    { text: 'Admin upload <b>SOP Penggajian 2026.pdf</b>', time: '14 menit lalu · 2.4 MB', dot: 'blue' },
-    { text: 'User <b>Siti Rahayu</b> konsultasi <b>SOP Cuti Melahirkan</b>', time: '1 jam lalu · Akurasi: Sesuai', dot: 'green' },
-    { text: 'User baru <b>Andi Firmansyah</b> terdaftar', time: '3 jam lalu', dot: 'purple' },
-  ];
+  get docCount(): number { return this.documents.length; }
+  get sessionCount(): number { return this.sessions.length; }
+  get activeSessions(): number { return this.sessions.filter(s => s.status === 'ACTIVE').length; }
 
-  constructor(private auth: AuthService) {
+  get activities() {
+    const docItems = this.documents.slice(0, 2).map(d => ({
+      text: `Dokumen <b>${d.title}</b> tersedia`,
+      time: new Date(d.uploaded_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      dot: 'blue'
+    }));
+    const sessionItems = this.sessions.slice(0, 3).map(s => ({
+      text: `Sesi chat <b>${s.title}</b>`,
+      time: new Date(s.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      dot: s.status === 'ACTIVE' ? 'green' : 'purple'
+    }));
+    return [...docItems, ...sessionItems].slice(0, 4);
+  }
+
+  constructor(
+    private auth: AuthService,
+    private docService: DocumentService,
+    private chatService: ChatService
+  ) {
     this.user = this.auth.getCurrentUser();
+  }
+
+  ngOnInit() {
+    forkJoin({
+      documents: this.docService.getAll(),
+      sessions: this.chatService.getSessions()
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: ({ documents, sessions }) => {
+        this.documents = documents;
+        this.sessions = sessions;
+        this.loading = false;
+      },
+      error: () => { this.loading = false; }
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
