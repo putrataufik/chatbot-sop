@@ -18,50 +18,83 @@
     <div class="error-banner" *ngIf="error">⚠ {{ error }}</div>
 
     <!-- LOGIN -->
-    <ng-container *ngIf="activeTab === 'login'">
+    <form #loginForm="ngForm" *ngIf="activeTab === 'login'" (ngSubmit)="login()">
       <div class="form-group">
         <label class="form-label">Email</label>
         <input class="form-input" type="email"
-          placeholder="email@contoh.com" [(ngModel)]="loginData.email">
+          placeholder="email@contoh.com"
+          [(ngModel)]="loginData.email"
+          name="loginEmail"
+          required
+          email
+          #loginEmail="ngModel">
+        <span class="field-error" *ngIf="loginEmail.invalid && loginEmail.touched">Masukkan email yang valid</span>
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
         <input class="form-input" type="password"
-          placeholder="••••••••" [(ngModel)]="loginData.password">
+          placeholder="••••••••"
+          [(ngModel)]="loginData.password"
+          name="loginPassword"
+          required
+          minlength="6"
+          #loginPassword="ngModel">
+        <span class="field-error" *ngIf="loginPassword.invalid && loginPassword.touched">
+          {{ loginPassword.errors?.['required'] ? 'Password wajib diisi' : 'Min. 6 karakter' }}
+        </span>
       </div>
-      <button class="btn-primary" [disabled]="loading" (click)="login()">
+      <button type="submit" class="btn-primary" [disabled]="loading || loginForm.invalid">
         {{ loading ? 'Memproses...' : 'Masuk ke Sistem' }}
       </button>
-    </ng-container>
+    </form>
 
     <!-- REGISTER -->
-    <ng-container *ngIf="activeTab === 'register'">
+    <form #registerForm="ngForm" *ngIf="activeTab === 'register'" (ngSubmit)="register()">
       <div class="form-group">
         <label class="form-label">Nama Lengkap</label>
         <input class="form-input" type="text"
-          placeholder="Nama lengkap" [(ngModel)]="registerData.name">
+          placeholder="Nama lengkap"
+          [(ngModel)]="registerData.name"
+          name="regName"
+          required
+          #regName="ngModel">
+        <span class="field-error" *ngIf="regName.invalid && regName.touched">Nama wajib diisi</span>
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
         <input class="form-input" type="email"
-          placeholder="email@contoh.com" [(ngModel)]="registerData.email">
+          placeholder="email@contoh.com"
+          [(ngModel)]="registerData.email"
+          name="regEmail"
+          required
+          email
+          #regEmail="ngModel">
+        <span class="field-error" *ngIf="regEmail.invalid && regEmail.touched">Masukkan email yang valid</span>
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
         <input class="form-input" type="password"
-          placeholder="Min. 6 karakter" [(ngModel)]="registerData.password">
+          placeholder="Min. 6 karakter"
+          [(ngModel)]="registerData.password"
+          name="regPassword"
+          required
+          minlength="6"
+          #regPassword="ngModel">
+        <span class="field-error" *ngIf="regPassword.invalid && regPassword.touched">
+          {{ regPassword.errors?.['required'] ? 'Password wajib diisi' : 'Min. 6 karakter' }}
+        </span>
       </div>
       <div class="form-group">
         <label class="form-label">Role</label>
-        <select class="form-input" [(ngModel)]="registerData.role">
+        <select class="form-input" [(ngModel)]="registerData.role" name="regRole">
           <option value="USER">User</option>
           <option value="ADMIN">Admin</option>
         </select>
       </div>
-      <button class="btn-primary" [disabled]="loading" (click)="register()">
+      <button type="submit" class="btn-primary" [disabled]="loading || registerForm.invalid">
         {{ loading ? 'Memproses...' : 'Buat Akun' }}
       </button>
-    </ng-container>
+    </form>
 
   </div>
 </div>

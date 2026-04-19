@@ -34,10 +34,8 @@ export class LoginComponent {
     this.error = '';
     this.auth.login(this.loginData).subscribe({
       next: (res) => {
-        console.log('RESPONSE LOGIN:', res);
         this.loading = false;
         const role = res.user?.role;
-        console.log('ROLE:', role);
         if (role === 'ADMIN') {
           this.router.navigate(['/dashboard']);
         } else {
@@ -45,7 +43,6 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        console.log('ERROR LOGIN:', err);
         this.error = err.error?.message || 'Email atau password salah';
         this.loading = false;
       },

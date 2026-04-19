@@ -5,17 +5,35 @@
       <div class="page-subtitle">Selamat datang, {{ user?.name }}</div>
     </div>
     <div class="topbar-actions">
-      <span class="date-chip">📅 Maret 2026</span>
+      <span class="date-chip">📅 {{ today | date:'MMMM y' }}</span>
     </div>
   </div>
 
   <div class="page-body">
     <div class="stats-grid">
-      <div class="stat-card" *ngFor="let stat of stats" [class]="stat.theme">
-        <div class="stat-icon">{{ stat.icon }}</div>
-        <div class="stat-value">{{ stat.value }}</div>
-        <div class="stat-label">{{ stat.label }}</div>
-        <div class="stat-trend">{{ stat.trend }}</div>
+      <div class="stat-card blue">
+        <div class="stat-icon">📄</div>
+        <div class="stat-value">{{ loading ? '...' : docCount }}</div>
+        <div class="stat-label">Dokumen SOP</div>
+        <div class="stat-trend">Total dokumen terupload</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">💬</div>
+        <div class="stat-value">{{ loading ? '...' : sessionCount }}</div>
+        <div class="stat-label">Total Sesi Chat</div>
+        <div class="stat-trend">{{ activeSessions }} sesi aktif</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-value">—</div>
+        <div class="stat-label">Akurasi Respons</div>
+        <div class="stat-trend">Data belum tersedia</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value">—</div>
+        <div class="stat-label">Efisiensi Token</div>
+        <div class="stat-trend">RLM vs Konvensional</div>
       </div>
     </div>
 
@@ -25,13 +43,19 @@
           <span class="card-title">Aktivitas Terbaru</span>
         </div>
         <div class="card-body">
-          <div class="activity-item" *ngFor="let a of activities">
-            <div class="dot" [class]="'dot-' + a.dot"></div>
-            <div>
-              <div class="act-text" [innerHTML]="a.text"></div>
-              <div class="act-time">{{ a.time }}</div>
+          <div class="loading" *ngIf="loading">Memuat aktivitas...</div>
+          <ng-container *ngIf="!loading">
+            <div class="activity-item" *ngFor="let a of activities">
+              <div class="dot" [class]="'dot-' + a.dot"></div>
+              <div>
+                <div class="act-text" [innerHTML]="a.text"></div>
+                <div class="act-time">{{ a.time }}</div>
+              </div>
             </div>
-          </div>
+            <div class="empty-state" *ngIf="activities.length === 0">
+              Belum ada aktivitas
+            </div>
+          </ng-container>
         </div>
       </div>
 

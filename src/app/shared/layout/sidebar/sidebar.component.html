@@ -32,9 +32,13 @@
         <button class="btn-new-chat" (click)="onNewChat()">
           <span>✏️</span> New Chat
         </button>
+        <input class="session-search"
+               type="text"
+               placeholder="Cari sesi..."
+               [(ngModel)]="sessionSearch">
         <div class="session-list">
           <div class="session-item"
-               *ngFor="let s of sessions"
+               *ngFor="let s of filteredSessions"
                [class.active]="activeSessionId === s.id"
                (click)="onSelectSession(s)">
             <div class="session-title">{{ s.title }}</div>
@@ -44,8 +48,8 @@
               {{ s.status === 'ACTIVE' ? 'Aktif' : 'Selesai' }}
             </div>
           </div>
-          <div class="session-empty" *ngIf="sessions.length === 0">
-            Belum ada sesi chat
+          <div class="session-empty" *ngIf="filteredSessions.length === 0">
+            {{ sessionSearch ? 'Tidak ditemukan' : 'Belum ada sesi chat' }}
           </div>
         </div>
       </div>
@@ -57,9 +61,13 @@
       <button class="btn-new-chat" (click)="onNewChat()">
         <span>✏️</span> New Chat
       </button>
+      <input class="session-search"
+             type="text"
+             placeholder="Cari sesi..."
+             [(ngModel)]="sessionSearch">
       <div class="session-list">
         <div class="session-item"
-             *ngFor="let s of sessions"
+             *ngFor="let s of filteredSessions"
              [class.active]="activeSessionId === s.id"
              (click)="onSelectSession(s)">
           <div class="session-title">{{ s.title }}</div>
@@ -69,8 +77,8 @@
             {{ s.status === 'ACTIVE' ? 'Aktif' : 'Selesai' }}
           </div>
         </div>
-        <div class="session-empty" *ngIf="sessions.length === 0">
-          Belum ada sesi chat
+        <div class="session-empty" *ngIf="filteredSessions.length === 0">
+          {{ sessionSearch ? 'Tidak ditemukan' : 'Belum ada sesi chat' }}
         </div>
       </div>
     </ng-container>

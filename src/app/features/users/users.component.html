@@ -4,7 +4,7 @@
       <div class="page-title">Manajemen User</div>
       <div class="page-subtitle">Kelola akun pengguna sistem</div>
     </div>
-    <button class="btn-primary" (click)="showAddModal = true">+ Tambah User</button>
+    <button class="btn-primary" (click)="openAddModal()">+ Tambah User</button>
   </div>
 
   <div class="page-body">
@@ -42,7 +42,7 @@
             <td class="muted">{{ u.created_at | date:'d MMM y' }}</td>
             <td>
               <div class="row-actions">
-                <button class="btn-ghost">✏️ Edit</button>
+                <button class="btn-ghost" (click)="openEditModal(u)">✏️ Edit</button>
                 <button class="btn-danger" (click)="delete(u.id)">🗑</button>
               </div>
             </td>
@@ -53,38 +53,65 @@
   </div>
 </div>
 
-<!-- Add User Modal -->
-<div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
+<!-- Add / Edit User Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <span class="modal-title">Tambah User Baru</span>
-      <button class="close-btn" (click)="showAddModal = false">✕</button>
+      <span class="modal-title">{{ isEditing ? 'Edit User' : 'Tambah User Baru' }}</span>
+      <button class="close-btn" (click)="showModal = false">✕</button>
     </div>
-    <div class="form-group">
-      <label class="form-label">Nama</label>
-      <input class="form-input" type="text"
-             placeholder="Nama lengkap" [(ngModel)]="newUser.name">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input class="form-input" type="email"
-             placeholder="email@perusahaan.com" [(ngModel)]="newUser.email">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Role</label>
-      <select class="form-input" [(ngModel)]="newUser.role">
-        <option value="USER">User</option>
-        <option value="ADMIN">Admin</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input class="form-input" type="password"
-             placeholder="Min. 6 karakter" [(ngModel)]="newUser.password">
-    </div>
-    <div class="modal-footer">
-      <button class="btn-ghost" (click)="showAddModal = false">Batal</button>
-      <button class="btn-primary">Buat Akun</button>
-    </div>
+
+    <form #userForm="ngForm">
+      <div class="form-group">
+        <label class="form-label">Nama</label>
+        <input class="form-input" type="text"
+               placeholder="Nama lengkap"
+               [(ngModel)]="formData.name"
+               name="name"
+               required
+               #nameField="ngModel">
+        <span class="field-error" *ngIf="nameField.invalid && nameField.touched">Nama wajib diisi</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email"
+               placeholder="email@perusahaan.com"
+               [(ngModel)]="formData.email"
+               name="email"
+               required
+               email
+               [disabled]="isEditing"
+               #emailField="ngModel">
+        <span class="field-error" *ngIf="emailField.invalid && emailField.touched">Masukkan email yang valid</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-input" [(ngModel)]="formData.role" name="role">
+          <option value="USER">User</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password{{ isEditing ? ' (opsional)' : '' }}</label>
+        <input class="form-input" type="password"
+               [placeholder]="isEditing ? 'Kosongkan jika tidak diubah' : 'Min. 6 karakter'"
+               [(ngModel)]="formData.password"
+               name="password"
+               [required]="!isEditing"
+               minlength="6"
+               #pwdField="ngModel">
+        <span class="field-error" *ngIf="pwdField.invalid && pwdField.touched">
+          {{ pwdField.errors?.['required'] ? 'Password wajib diisi' : 'Min. 6 karakter' }}
+        </span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" (click)="showModal = false">Batal</button>
+        <button type="button" class="btn-primary"
+                [disabled]="saving || userForm.invalid"
+                (click)="saveUser()">
+          {{ saving ? 'Menyimpan...' : (isEditing ? 'Simpan' : 'Buat Akun') }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>

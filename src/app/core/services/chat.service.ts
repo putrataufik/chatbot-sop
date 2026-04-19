@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ChatSession, Message, SubQueryResult, TokenUsageLog } from '../models/chat.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  private readonly BASE = 'http://localhost:3000/api/chatbot-sop/chat';
+  private readonly BASE = `${environment.apiUrl}/chat`;
 
   constructor(private http: HttpClient) {}
 
