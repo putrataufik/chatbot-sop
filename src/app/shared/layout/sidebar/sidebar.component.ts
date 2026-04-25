@@ -22,12 +22,6 @@ export class SidebarComponent implements OnInit {
   activeSessionId: number | null = null;
   sessionSearch = '';
 
-  adminItems = [
-    { label: 'Dashboard', icon: '📊', route: '/dashboard' },
-    { label: 'Dokumen SOP', icon: '📄', route: '/documents' },
-    { label: 'Manajemen User', icon: '👥', route: '/users' },
-  ];
-
   get filteredSessions(): ChatSession[] {
     if (!this.sessionSearch.trim()) return this.sessions;
     const q = this.sessionSearch.toLowerCase();
@@ -41,15 +35,22 @@ export class SidebarComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.user = this.auth.getCurrentUser();
-    this.isAdmin = this.auth.isAdmin();
-    this.navItems = this.isAdmin ? [
-      { label: 'Dashboard', icon: '📊', route: '/dashboard' },
-      { label: 'Chat SOP', icon: '💬', route: '/chat' },
-      { label: 'Dokumen SOP', icon: '📄', route: '/documents' },
-    ] : [];
-    this.loadSessions();
+  this.user = this.auth.getCurrentUser();
+  this.isAdmin = this.auth.isAdmin();
+
+  if (this.isAdmin) {
+    this.navItems = [
+      { label: 'Dashboard',       icon: '📊', route: '/dashboard' },
+      { label: 'Chat SOP',        icon: '💬', route: '/chat' },
+      { label: 'Dokumen SOP',     icon: '📄', route: '/documents' },
+      { label: 'Manajemen User',  icon: '👥', route: '/users' },
+    ];
+  } else {
+    this.navItems = [];
   }
+
+  this.loadSessions();
+}
 
   loadSessions() {
     this.chatService.getSessions().subscribe({

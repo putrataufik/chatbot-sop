@@ -17,7 +17,7 @@
             <th>Nama</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Login Terakhir</th>
+            <th>Login terakhir</th>
             <th>Terdaftar</th>
             <th>Aksi</th>
           </tr>
@@ -42,8 +42,8 @@
             <td class="muted">{{ u.created_at | date:'d MMM y' }}</td>
             <td>
               <div class="row-actions">
-                <button class="btn-ghost" (click)="openEditModal(u)">✏️ Edit</button>
-                <button class="btn-danger" (click)="delete(u.id)">🗑</button>
+                <button class="btn-edit" (click)="openEditModal(u)">Edit</button>
+                <button class="btn-del" (click)="delete(u.id)">Del</button>
               </div>
             </td>
           </tr>
@@ -58,7 +58,7 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <span class="modal-title">{{ isEditing ? 'Edit User' : 'Tambah User Baru' }}</span>
-      <button class="close-btn" (click)="showModal = false">✕</button>
+      <button class="close-btn" (click)="showModal = false">×</button>
     </div>
 
     <form #userForm="ngForm">

@@ -1,4 +1,5 @@
 <aside class="sidebar">
+
   <div class="sidebar-logo">
     <div class="logo-icon">🧠</div>
     <div>
@@ -16,51 +17,9 @@
       {{ item.label }}
     </a>
 
-    <ng-container *ngIf="isAdmin">
-      <a *ngFor="let item of adminItems"
-         [routerLink]="item.route"
-         routerLinkActive="active"
-         class="nav-item">
-        <span class="nav-icon">{{ item.icon }}</span>
-        {{ item.label }}
-      </a>
-    </ng-container>
-
-    <!-- New Chat Button + Session List (hanya tampil jika USER) -->
-    <ng-container *ngIf="!isAdmin">
-      <div class="session-section">
-        <button class="btn-new-chat" (click)="onNewChat()">
-          <span>✏️</span> New Chat
-        </button>
-        <input class="session-search"
-               type="text"
-               placeholder="Cari sesi..."
-               [(ngModel)]="sessionSearch">
-        <div class="session-list">
-          <div class="session-item"
-               *ngFor="let s of filteredSessions"
-               [class.active]="activeSessionId === s.id"
-               (click)="onSelectSession(s)">
-            <div class="session-title">{{ s.title }}</div>
-            <div class="session-status"
-                 [class.active]="s.status === 'ACTIVE'"
-                 [class.closed]="s.status === 'CLOSED'">
-              {{ s.status === 'ACTIVE' ? 'Aktif' : 'Selesai' }}
-            </div>
-          </div>
-          <div class="session-empty" *ngIf="filteredSessions.length === 0">
-            {{ sessionSearch ? 'Tidak ditemukan' : 'Belum ada sesi chat' }}
-          </div>
-        </div>
-      </div>
-    </ng-container>
-
-    <!-- New Chat Button + Session List (hanya tampil jika ADMIN) -->
-    <ng-container *ngIf="isAdmin">
-      <div class="nav-section-label">Chat</div>
-      <button class="btn-new-chat" (click)="onNewChat()">
-        <span>✏️</span> New Chat
-      </button>
+    <div class="session-section">
+      <div class="nav-section-label" *ngIf="isAdmin">Chat</div>
+      <button class="btn-new-chat" (click)="onNewChat()">+ New Chat</button>
       <input class="session-search"
              type="text"
              placeholder="Cari sesi..."
@@ -71,17 +30,12 @@
              [class.active]="activeSessionId === s.id"
              (click)="onSelectSession(s)">
           <div class="session-title">{{ s.title }}</div>
-          <div class="session-status"
-               [class.active]="s.status === 'ACTIVE'"
-               [class.closed]="s.status === 'CLOSED'">
-            {{ s.status === 'ACTIVE' ? 'Aktif' : 'Selesai' }}
-          </div>
         </div>
         <div class="session-empty" *ngIf="filteredSessions.length === 0">
           {{ sessionSearch ? 'Tidak ditemukan' : 'Belum ada sesi chat' }}
         </div>
       </div>
-    </ng-container>
+    </div>
   </nav>
 
   <div class="sidebar-footer">
@@ -94,4 +48,5 @@
       <button class="logout-btn" (click)="logout()" title="Logout">↩</button>
     </div>
   </div>
+
 </aside>

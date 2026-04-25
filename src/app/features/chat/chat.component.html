@@ -1,24 +1,13 @@
 <div class="chat-layout">
 
-  <!-- Chat Main -->
   <div class="chat-main">
 
     <!-- Welcome Screen -->
     <div class="chat-welcome" *ngIf="!activeSession">
       <div class="welcome-icon">🧠</div>
       <div class="welcome-title">SOP Intellect</div>
-      <div class="welcome-sub">
-        Buat sesi baru untuk mulai konsultasi SOP
-      </div>
-      <button class="btn-new-session" (click)="showNewSessionModal = true">
-        ✏️ Mulai Chat Baru
-      </button>
-      <div class="suggestion-chips">
-        <div class="chip">Syarat cuti melahirkan?</div>
-        <div class="chip">Prosedur rekrutmen karyawan?</div>
-        <div class="chip">Cara klaim lembur?</div>
-        <div class="chip">SOP pengadaan barang?</div>
-      </div>
+      <div class="welcome-sub">Buat sesi baru untuk mulai konsultasi SOP</div>
+      <button class="btn-new-session" (click)="startNewSession()">+ Mulai Chat Baru</button>
     </div>
 
     <!-- Active Session -->
@@ -33,7 +22,7 @@
           </div>
         </div>
         <button class="btn-ghost" (click)="showRlmPanel = !showRlmPanel">
-          🔬 RLM Detail
+          RLM Detail
         </button>
       </div>
 
@@ -41,29 +30,37 @@
         <div class="msg-group"
              *ngFor="let msg of messages"
              [class.user]="msg.role === 'USER'">
+
           <div class="msg-avatar"
                [class.avatar-user]="msg.role === 'USER'"
                [class.avatar-bot]="msg.role !== 'USER'">
             {{ msg.role === 'USER' ? getInitials(user?.name || '') : '🧠' }}
           </div>
+
           <div class="msg-content">
             <div class="msg-bubble"
                  [class.bubble-user]="msg.role === 'USER'"
                  [class.bubble-bot]="msg.role !== 'USER'">
-              {{ msg.content }}
+
+              <ng-container *ngIf="msg.role === 'USER'">
+                {{ msg.content }}
+              </ng-container>
+
+              <markdown *ngIf="msg.role !== 'USER'" [data]="msg.content"></markdown>
+
             </div>
+
             <div class="msg-meta" [class.right]="msg.role === 'USER'">
               <span class="msg-time">{{ formatTime(msg.timestamp) }}</span>
               <ng-container *ngIf="msg.role !== 'USER' && msg.input_tokens">
                 <span class="token-badge">
-                  ⚡ {{ (msg.input_tokens || 0) + (msg.output_tokens || 0) }} token
+                  {{ (msg.input_tokens || 0) + (msg.output_tokens || 0) }} token
                 </span>
-                <span class="rlm-chip" (click)="showRlm(msg)">
-                  RLM · Detail →
-                </span>
+                <span class="rlm-chip" (click)="showRlm(msg)">RLM · Detail →</span>
               </ng-container>
             </div>
           </div>
+
         </div>
 
         <!-- Typing Indicator -->
@@ -88,6 +85,7 @@
         </div>
       </div>
     </ng-container>
+
   </div>
 
   <!-- RLM Panel -->
@@ -98,6 +96,7 @@
       <button class="close-btn" (click)="showRlmPanel = false">✕</button>
     </div>
     <div class="rlm-body">
+
       <div class="rlm-step">
         <div class="step-num">1</div>
         <div class="step-label">Problem Decomposition</div>
@@ -130,6 +129,9 @@
             <div class="tl">Output Token</div>
           </div>
         </div>
+        <div class="step-empty" *ngIf="!selectedTokenUsage">
+          Klik "RLM · Detail" pada pesan bot
+        </div>
       </div>
 
       <div class="rlm-step">
@@ -144,28 +146,8 @@
         <div class="sv">~{{ calcSaving(selectedTokenUsage) }}%</div>
         <div class="sl">lebih hemat vs konvensional</div>
       </div>
+
     </div>
   </div>
 
-</div>
-
-<!-- New Session Modal -->
-<div class="modal-overlay" *ngIf="showNewSessionModal"
-     (click)="showNewSessionModal = false">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <span class="modal-title">Sesi Chat Baru</span>
-      <button class="close-btn" (click)="showNewSessionModal = false">✕</button>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Judul Sesi</label>
-      <input class="form-input" type="text"
-             placeholder="cth. Konsultasi SOP Rekrutmen"
-             [(ngModel)]="newSessionTitle">
-    </div>
-    <div class="modal-footer">
-      <button class="btn-ghost" (click)="showNewSessionModal = false">Batal</button>
-      <button class="btn-primary" (click)="createSession()">Mulai Sesi</button>
-    </div>
-  </div>
 </div>

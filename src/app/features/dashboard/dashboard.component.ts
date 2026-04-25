@@ -25,20 +25,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   get docCount(): number { return this.documents.length; }
   get sessionCount(): number { return this.sessions.length; }
-  get activeSessions(): number { return this.sessions.filter(s => s.status === 'ACTIVE').length; }
+  get activeSessions(): number {
+    return this.sessions.filter(s => s.status === 'ACTIVE').length;
+  }
 
   get activities() {
     const docItems = this.documents.slice(0, 2).map(d => ({
       text: `Dokumen <b>${d.title}</b> tersedia`,
-      time: new Date(d.uploaded_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      time: new Date(d.uploaded_at).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      }),
       dot: 'blue'
     }));
     const sessionItems = this.sessions.slice(0, 3).map(s => ({
       text: `Sesi chat <b>${s.title}</b>`,
-      time: new Date(s.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      time: new Date(s.created_at).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      }),
       dot: s.status === 'ACTIVE' ? 'green' : 'purple'
     }));
-    return [...docItems, ...sessionItems].slice(0, 4);
+    return [...docItems, ...sessionItems].slice(0, 5);
   }
 
   constructor(
